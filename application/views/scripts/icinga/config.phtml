@@ -1,0 +1,44 @@
+<div class="controls">
+<?= $this->tabs ?>
+</div>
+
+<div class="content">
+<h1>Generated Config</h1>
+<pre>
+# LYNX Technik Icinga Configuration.
+# This file has been generated automatically, manual changes will be lost.
+<?php foreach ($this->config as $service): ?>
+
+define service {
+    use                  <?= $this->escape($service->template_name) ?> 
+    host_name            <?= $this->escape($service->host_name) ?> 
+    service_description  <?= $this->escape($service->service_description) ?> 
+    __LYNX_SERVICE_ID    <?= $this->escape($service->id) ?>     
+}
+<?php endforeach ?>
+</pre>
+
+<h1><?= $this->translate('Sample command and base template') ?></h1>
+<pre>
+# Please copy this sample to your Icinga configuration and adjust it
+# to fit your personal needs.
+
+define command {
+    command_name    check_lynx_service
+    command_line    $USER1$/check_lynx_service $ARG1$
+}
+
+define service {
+    use              generic-service
+    name             lynx-service
+    check_command    check_lynx_service!$_SERVICE_LYNX_SERVICE_ID$
+    register         0
+}
+
+define host {
+    use              linux-server
+    host_name        LYNX Checks
+    address          127.5.0.0
+}
+</pre>
+</div>

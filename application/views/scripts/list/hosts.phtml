@@ -1,0 +1,25 @@
+<div class="controls">
+<?= $this->tabs ?>
+<h1><?= $this->translate('Icinga Hosts') ?></h1>
+</div>
+
+<div class="content" data-base-target="_next">
+<?= $this->qlink($this->translate('Add new Icinga Host'), 'lynxtechnik/add/host') ?>
+<?php if (empty($this->list)): ?>
+<br /><?= $this->translate('No host found') ?>
+</div>
+<?php return; endif ?>
+
+<table class="action">
+<?php foreach ($this->list as $row): ?>
+<tr>
+  <td><?= $this->qlink(
+  $row->host_name,
+  'lynxtechnik/modify/host',
+  array(
+      'id' => $row->id
+  )) ?></td>
+</tr>
+<?php endforeach ?>
+</table>
+</div>

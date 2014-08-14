@@ -1,0 +1,46 @@
+<?php
+
+$states = array('critical', 'unknown', 'warning', 'ok');
+
+?><div class="controls">
+<?= $this->tabs ?>
+<h1><?= $this->translate('Icinga Services') ?></h1>
+</div>
+
+<div class="content" data-base-target="_next">
+<?= $this->qlink($this->translate('Add new Icinga Service'), 'lynxtechnik/add/service') ?>
+<?php if (empty($this->list)): ?>
+<br /><?= $this->translate('No service found') ?>
+</div>
+<?php return; endif ?>
+
+<table class="action">
+<?php foreach ($this->list as $row): ?>
+<?php
+
+$stateInfo = array();
+
+foreach ($states as $state) {
+    if ($row->{'cnt_' . $state}) {
+        $stateInfo[$state] = '<span class="state '
+            . $state
+            . '">' . $row->{'cnt_' . $state} . ' ' . $state . '</span>';
+    }
+}
+?>
+<tr>
+  <td><?= $this->qlink(
+  $row->service_description,
+  'lynxtechnik/modify/service',
+  array(
+      'id' => $row->id
+  )) ?><?php if ($row->modules): ?>
+  <?php if (! empty($stateInfo)): ?>
+  <?= implode(' ', $stateInfo) ?>
+  <?php endif ?>
+  <br /> <small style="font-size: 0.8em;"><?= $this->escape(preg_replace('/,/', '; ', $row->modules)) ?></small>
+  <?php endif ?></td>
+</tr>
+<?php endforeach ?>
+</table>
+</div>

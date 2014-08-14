@@ -1,0 +1,7 @@
+Module: lynxtechnik
+Version: 0.9.5
+Description: Lynx-Technik 5000 series monitoring module
+ Combined with the Lynx SNMP Daemon and the Lynx SNMP Trap handler this
+ module offers a great way for monitoring Lynx Technik 5000 devices.
+
+ Special thanks goes to Deutsche Welle for sponsoring the development.

@@ -1,0 +1,7 @@
+<h1><?= $this->escape($this->title) ?></h1>
+<? foreach ($this->devices as $ip => $device): ?>
+<h2><?= $ip ?></h2>
+<pre>
+<?= $this->escape(print_r($device->dump(), 1)) ?>
+</pre>
+<? endforeach ?>

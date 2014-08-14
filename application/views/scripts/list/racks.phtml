@@ -1,0 +1,23 @@
+<div class="controls">
+<?= $this->tabs ?>
+<h1><?= $this->translate('Datacenter Tacks') ?></h1>
+</div>
+
+<div class="content" data-base-target="_next">
+<?= $this->qlink($this->translate('Add new rack'), 'lynxtechnik/add/rack') ?>
+<?php if (empty($this->list)): ?>
+<?= $this->translate('No rack found') ?>
+</div>
+<?php return; endif ?>
+
+<table class="action">
+<?php foreach ($this->list as $row): ?>
+<tr>
+  <td><?= $this->qlink($row->display_name, 'lynxtechnik/modify/rack', array(
+      'id' => $row->id
+  )) ?></td>
+  <td><?= $this->escape($row->room) ?></td>
+</tr>
+<?php endforeach ?>
+</table>
+</div>

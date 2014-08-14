@@ -1,0 +1,251 @@
+/* BEGIN Forms */
+form dt label {
+    width: auto;
+}
+
+dd {
+    margin: 0;
+}
+/* END of Forms */
+
+div.rack {
+    border-radius: 0.3em;
+    margin-bottom: 0.6em;
+    border: 1px solid black;
+    padding: 0.5em;
+    vertical-align: top;
+    background: #eee;
+}
+
+div.rack {
+
+  table {
+    border: 2px solid black;
+    margin-bottom: 0.6em;
+    table-layout: fixed;
+  }
+
+  table.frame {
+    table-layout: fixed;
+    border: 2px solid black;
+    background-color: white;
+  }
+
+  table td {
+    font-size: 0.8em;
+    vertical-align: top;
+    text-align: center;
+    padding: 1px;
+    width: 9%;
+  }
+
+  table .state {
+    text-align: center;
+    font-weight: bold;
+    color: white;
+    padding: 0.2em;
+    margin: 0;
+  }
+
+  table .state.unknown {
+    background-color: @colorUnknown;
+  }
+
+  table .state.critical {
+    background-color: @colorCritical;
+  }
+
+  table .state.warning {
+    background-color: @colorWarning;
+  }
+
+  table .state.ok {
+    background-color: @colorOk;
+  }
+
+  table .state.off {
+    background-color: black;
+  }
+
+  table td.empty {
+    background: #ccc;
+  }
+
+  table td.rct {
+    background: #555;
+    color: white;
+  }
+
+  table td span.address {
+    text-align: center;
+    display: block;
+/*
+    border-top: 1px solid #555;
+    font-family: monospace;
+    margin-bottom: 0.8em;
+*/
+  }
+/*
+  table td.rct span.address {
+    border-color: white;
+  }
+*/
+  table td h4 {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+
+  table td p {
+      margin: 1em 0.5em 1em 0.5em;
+      font-style: italic;
+      font-size: 0.9em;
+  }
+
+  table td ul.errors {
+    list-style-type: none;
+    margin: 0.5em 0 0.5em 0;
+    padding: 0;
+    color: @colorCritical;
+  }
+
+  table th {
+      text-align: left;
+      padding-left: 1em;
+      line-height: 2em;
+      background-color: #555;
+  }
+
+  table th a {
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+  }
+
+  table th a:hover {
+      text-decoration: underline;
+  }
+
+}
+
+
+div.compactrack {
+
+  table {
+    border: 1px solid black;
+    margin-bottom: 0.6em;
+    table-layout: fixed;
+    width: 16em;
+  }
+
+  table.frame {
+    background-color: white;
+  }
+
+  table td {
+    font-size: 0.8em;
+    vertical-align: top;
+    text-align: center;
+    padding: 1px;
+  }
+
+  table .state {
+    text-align: center;
+    font-weight: bold;
+    color: transparent;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    height: 2em;
+  }
+
+  table .state.unknown {
+    background-color: @colorUnknown;
+  }
+
+  table .state.critical {
+    background-color: @colorCritical;
+  }
+
+  table .state.warning {
+    background-color: @colorWarning;
+  }
+
+  table .state.ok {
+    background-color: @colorOk;
+  }
+
+  table .state.off {
+    background-color: black;
+  }
+
+  table td.empty {
+    background: #ccc;
+  }
+
+  table td.rct {
+    background: #555;
+    color: white;
+  }
+  table td span.address {
+    display: none;
+  }
+
+  table td p {
+    display: none;
+  }
+
+  table td ul.errors {
+    display: none;
+  }
+}
+
+
+
+div.server {
+    font-size: 0.6em;
+    border: 0.3em solid black;
+    position: inline-block;
+    vertical-align: top;
+    width: 98%;
+    border-radius: 0.4em;
+    padding: 0.2em;
+    margin-bottom: 0.4em;
+    color: white;
+    background-color: #ccc;
+}
+
+div.server h3 {
+    font-size: 1.2em;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    font-family: Courier New, mono-spaced;
+}
+
+span.state {
+    font-size: 0.8em;
+    color: white;
+    font-weight: bold;
+    padding: 3px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+span.state.ok {
+    background: @colorOk;
+}
+
+span.state.critical {
+    background: @colorCritical;
+}
+
+span.state.warning {
+    background: @colorWarning;
+}
+
+span.state.unknown {
+    background: @colorUnknown;
+}

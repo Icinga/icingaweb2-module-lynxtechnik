@@ -1,0 +1,92 @@
+<div class="content">
+<h1><?= $this->escape($this->title) ?></h1>
+<?php
+
+$color_names = array(
+    'unknown', 'off', 'ok', 'warning', 'critical'
+);
+
+$ip = null;
+$new = false;
+$first = true;
+
+reset($this->devices);
+$main = current($this->devices);
+
+//echo '<h2>'
+//   . preg_replace('~^.+?\s*-\s*(.*)$~', '$1', $main->display_name) . ' (' . $this->escape(long2ip($main->address)) . ')'
+//   . "</h2>\n";
+
+echo '<div class="rack">
+<table class="frame"><tr>';
+
+$lastcol = 0;
+foreach ($this->devices as $device) {
+    if (preg_match('/ - /', $device->display_name)) {
+        list($device->short_type, $device->display_name) =
+            preg_split('/ - /', $device->display_name, 2);
+    } else {
+        $device->short_type = null;
+    }
+    // display_type is unused right, now. We remove it for DWTV as the policy
+    // here requires us to write the type in front of the display_name
+    $rpos = (int) $device->position & 0x000000ff;
+    if ($rpos === 0) {
+        if ($first) {
+            $first = false;
+        } else {
+
+            if ($lastcol > 0) {
+                for ($i = $lastcol; $i < 10; $i++) {
+                    echo $this->partial('show/module_emptyslot.phtml');
+                }
+            }
+
+            echo "</tr></table>\n" . '<table class="frame"><tr>' . "\n";
+        }
+    }
+
+    for ($i = 1; $i < ($rpos - $lastcol); $i++) {
+        echo $this->partial('show/module_emptyslot.phtml');
+    }
+
+    if ($rpos === 0) {
+        echo '<td class="rct">';
+    } else {
+        echo '<td>';
+    }
+    
+    echo '<h3 class="state '
+       . $color_names[$device->status_color]
+       . '">'
+       // . $color_names[$device->status_color]
+       . $this->escape($device->display_name)
+       . '</h3>'
+//       . '<h4>'
+//       . '</h4>'
+       . '<span class="address">' . $device->position_text . ' - v' . $device->version . '</span>'
+       ;
+
+    if ($device->status_text !== 'OK' && $device->status_text !== '0') {
+        echo '<ul class="errors">';
+        foreach (preg_split('/\n/', $device->status_text, -1, PREG_SPLIT_NO_EMPTY) as $error) {
+            echo '<li>' . $this->escape($error) . '</li>';
+        }
+        echo '</ul>';
+    }
+
+    echo '<p>' . $this->escape($device->type_name) . '</p>'
+       . "</td>\n"
+       ;
+
+    $lastcol = $rpos;
+}
+
+for ($i = $lastcol; $i < 10; $i++) {
+    echo $this->partial('show/module_emptyslot.phtml');
+}
+
+?>
+</tr></table></div>
+
+</div>

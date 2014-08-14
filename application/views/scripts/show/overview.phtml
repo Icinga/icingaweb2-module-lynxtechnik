@@ -1,0 +1,113 @@
+<div class="content" data-base-target="_next">
+<h1><?= $this->escape($this->title) ?></h1>
+<?php
+
+$color_names = array(
+    'unknown', 'off', 'ok', 'warning', 'critical'
+);
+
+$color_codes = array(
+    '#cccccc', '#ffffff', '#00ff00', '#ffff00', '#ff0000'
+);
+
+$ip = null;
+$new = false;
+$first = true;
+$rooms = array();
+$room = null;
+$rack = null;
+$ip = null;
+
+foreach ($this->devices as $device) {
+    
+    if ($device->address === $ip) {
+        $rooms[$room][$rack][] = $device;
+    } else {
+//        echo sprintf("IP CHan %s -> %s c", long2ip($device->address), long2ip($ip));
+        if ($room !== null) ksort($rooms[$room]);
+        $ip = $device->address;
+        $name = preg_replace('~^.+?\s*-\s*(.*)$~', '$1', $device->display_name);
+        if (preg_match('~^(.+?)\s+(\d+)-(\d+)\s*$~', $name, $match)) {
+            $room = $match[1];
+            $rack = $match[2];
+        } else {
+            $room = $name;
+            $rack = $name;
+            // throw new Exception("Invalid name $name");
+        }
+        if (isset($rooms[$room][$rack])) {
+            $rooms[$room][$rack][] = $device;
+        } else {
+            $rooms[$room][$rack] = array($device);
+        }
+    }
+}
+ksort($rooms);
+
+$current_room = null;
+foreach ($rooms as $room => $stacks) {
+ foreach ($stacks as $stack => $devices) {
+  foreach ($devices as $device) {
+    if ($device->address !== $ip) {
+        $new = true;
+        $ip = $device->address;
+        if ($first) {
+            echo '<div class="rack"><h3>'
+                   . $this->escape($room)
+                   . "</h3><table><tr>";
+            $first = false;
+        } else {
+            if ($current_room !== $room) {
+                echo "</table></div>\n<div class=\"rack\"><tr><td>\n<h3>"
+                   . $this->escape($room)
+                   . "</h3><table><tr>";
+            } else {
+                echo "</table><table><tr>";
+            }
+        }
+        echo '<th colspan="3"><a href="'
+           . $this->href('/lynxtechnik/show/stack/ip/' . long2ip($ip))
+           . '">'
+           . preg_replace('~^.+?\s*-\s*(.*)$~', '$1', $device->display_name) . ' (' . $this->escape(long2ip($ip)) . ')'
+           . "</a></th></tr>\n";
+        $current_room = $room;
+    }
+    $cellstyle = '';
+    if (($device->position & 0xffff) == 0) {
+        //$cellstyle = ' style="border-top: 2px solid black;"';
+    } elseif (($device->position & 0xff) == 0) {
+        //$cellstyle = ' style="border-top: 1px solid black;"';
+    } else {
+        continue;
+    }
+    echo '<tr>'
+       . '<td class="state '
+       . $color_names[$device->status_color]
+       . '">'
+       //.  style="background-color: '
+       //. $device->status_color_rgb
+       //. '; text-align: center; vertical-align: middle; width: 5em;">'
+       . $color_names[$device->status_color] /* . ' ' . $device->position_text */
+       . '</td>'
+       . '<td class="state '
+       . $color_names[$device->sub_color]
+       //. ' style="background-color: '
+       //. $color_codes[$device->sub_color]
+       //. '; text-align: center; vertical-align: middle; width: 5em;">'
+       . '">'
+       . $color_names[$device->sub_color]//  . ' ' . $device->position_text
+       . '</td>'
+       . '<td' . $cellstyle . '>'
+       // . $this->escape($device->type_name)
+       . $this->escape($device->display_name)
+ . ($device->status_text === 'OK' ? '' : '<p style="font-size: 0.6em;">' . nl2br($this->escape($device->status_text)) . '</p>')
+       . "</td></tr>\n";
+  }
+ }
+}
+
+?>
+</table>
+</div>
+
+</div>

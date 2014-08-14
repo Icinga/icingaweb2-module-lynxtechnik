@@ -1,0 +1,20 @@
+<div class="controls">
+<?= $this->tabs ?>
+<h1><?= $this->translate('Datacenter Rooms') ?></h1>
+</div>
+
+<div class="content" data-base-target="_next">
+<?= $this->qlink($this->translate('Add new room'), 'lynxtechnik/add/room') ?>
+<?php if (empty($this->list)): ?>
+<?= $this->translate('No room found') ?>
+</div>
+<?php return; endif ?>
+
+<table class="action">
+<?php foreach ($this->list as $row): ?>
+<tr><td><?= $this->qlink($row->display_name, 'lynxtechnik/modify/room', array(
+    'id' => $row->id
+)) ?></td></tr>
+<?php endforeach ?>
+</table>
+</div>
