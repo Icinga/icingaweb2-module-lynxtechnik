@@ -1,10 +1,18 @@
 <div class="controls">
 <?= $this->tabs ?>
 <h1><?= $this->translate('LYNX Technik Controllers') ?></h1>
+<?= $this->qlink(
+    $this->translate('Add'),
+    'lynxtechnik/add/controller',
+    null,
+    array(
+        'class' => 'action icon-plus',
+        'title' => $this->translate('Add new controller'),
+    )
+) ?>
 </div>
 
 <div class="content" data-base-target="_next">
-<?= $this->qlink($this->translate('Add new controller'), 'lynxtechnik/add/controller') ?>
 <?php if (empty($this->list)): ?>
 <br /><?= $this->translate('No controller found') ?>
 </div>

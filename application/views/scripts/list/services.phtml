@@ -5,10 +5,18 @@ $states = array('critical', 'unknown', 'warning', 'ok');
 ?><div class="controls">
 <?= $this->tabs ?>
 <h1><?= $this->translate('Icinga Services') ?></h1>
+<?= $this->qlink(
+    $this->translate('Add'),
+    'lynxtechnik/add/service',
+    null,
+    array(
+        'class' => 'action icon-plus',
+        'title' => $this->translate('Add new Icinga Service'),
+    )
+) ?>
 </div>
 
 <div class="content" data-base-target="_next">
-<?= $this->qlink($this->translate('Add new Icinga Service'), 'lynxtechnik/add/service') ?>
 <?php if (empty($this->list)): ?>
 <br /><?= $this->translate('No service found') ?>
 </div>

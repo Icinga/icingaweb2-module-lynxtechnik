@@ -27,12 +27,18 @@ a.wide {
 }
 
 
-h1 {
-    font-size: 1.2em;
-}
+.controls {
+  a:focus {
+     outline: none;
+  }
 
-.controls a:focus {
-    outline: none;
+  a.action {
+    color: @icinga-blue;
+
+    &::before {
+      text-decoration: none;
+    }
+  }
 }
 
 div.rack {
