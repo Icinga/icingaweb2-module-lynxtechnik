@@ -19,6 +19,7 @@ class Lynxtechnik_AddController extends ActionController
         $this->view->title = $this->translate('Add new Icinga Host');
         $this->view->form = $this->loadForm('icingaHost')
             ->setDb($this->db())
+            ->setLConfSync($this->lconf())
             ->setSuccessUrl('lynxtechnik/list/hosts')
             ->handleRequest();
         $this->render('form');
@@ -29,6 +30,7 @@ class Lynxtechnik_AddController extends ActionController
         $this->view->title = $this->translate('Add new Icinga Service');
         $this->view->form = $this->loadForm('icingaService')
             ->setDb($this->db())
+            ->setLConfSync($this->lconf())
             ->setSuccessUrl('lynxtechnik/list/services')
             ->handleRequest();
         $this->render('form');

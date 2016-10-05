@@ -4,6 +4,7 @@ namespace Icinga\Module\Lynxtechnik;
 
 use Icinga\Application\Icinga;
 use Icinga\Module\Lynxtechnik\Db;
+use Icinga\Module\Lynxtechnik\LConfSync;
 use Icinga\Module\Lynxtechnik\Web\Form\FormLoader;
 use Icinga\Web\Controller;
 use Icinga\Web\Widget;
@@ -11,6 +12,8 @@ use Icinga\Web\Widget;
 abstract class ActionController extends Controller
 {
     protected $db;
+
+    private $lconf;
 
     protected $forcedMonitoring = false;
 
@@ -36,13 +39,19 @@ abstract class ActionController extends Controller
         )->add('hosts', array(
             'label' => $this->translate('Hosts'),
             'url'   => 'lynxtechnik/list/hosts')
-        )->add('templates', array(
-            'title' => $this->translate('Templates'),
+        )->add('controllers', array(
+            'label' => $this->translate('Controllers'),
+            'url'   => 'lynxtechnik/list/controllers')
+        );
+        if (! $this->lconf()->isEnabled()) {
+            $this->view->tabs->add('templates', array(
+            'label' => $this->translate('Templates'),
             'url'   => 'lynxtechnik/list/templates')
         )->add('config', array(
             'label' => $this->translate('Config'),
             'url'   => 'lynxtechnik/icinga/config')
         );
+        }
         return $this->view->tabs;
     }
 
@@ -57,11 +66,21 @@ abstract class ActionController extends Controller
         )/*->add('frames', array(
             'label' => $this->translate('Frames'),
             'url'   => 'lynxtechnik/list/frames')
-        )*/->add('controllers', array(
-            'title' => $this->translate('Controllers'),
+        )->add('controllers', array(
+            'label' => $this->translate('Controllers'),
             'url'   => 'lynxtechnik/list/controllers')
-        );
+        )*/;
         return $this->view->tabs;
+    }
+
+    protected function lconf()
+    {
+        if ($this->lconf === null) {
+            $this->lconf = new LConfSync(
+                $this->Config()->getSection('lconf'), $this->db()
+            );
+        }
+        return $this->lconf;
     }
 
     protected function db()

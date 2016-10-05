@@ -3,6 +3,7 @@
 namespace Icinga\Module\Lynxtechnik\Forms;
 
 use Icinga\Module\Lynxtechnik\IcingaHost;
+use Icinga\Module\Lynxtechnik\LConfSync;
 use Icinga\Module\Lynxtechnik\Web\Form\QuickForm;
 
 class IcingaHostForm extends QuickForm
@@ -10,6 +11,8 @@ class IcingaHostForm extends QuickForm
     protected $db;
 
     protected $object;
+
+    protected $lconf;
 
     public function setup()
     {
@@ -47,6 +50,15 @@ class IcingaHostForm extends QuickForm
         $this->object = IcingaHost::load($id, $this->db);
         $this->addHidden('id');
         $this->setDefaults($this->object->getProperties());
+        return $this;
+    }
+
+    public function setLConfSync(LConfSync $lconf)
+    {
+        $this->lconf = $lconf;
+        if ($lconf->isEnabled()) {
+            $this->removeElement('template_id');
+        }
         return $this;
     }
 

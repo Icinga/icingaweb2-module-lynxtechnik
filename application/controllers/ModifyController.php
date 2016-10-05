@@ -39,6 +39,7 @@ class Lynxtechnik_ModifyController extends ActionController
         $form = $this->loadForm('icingaHost')
             ->setDb($this->db())
             ->loadObject($this->params->get('id'))
+            ->setLConfSync($this->lconf())
             ->setSuccessUrl('lynxtechnik/list/hosts')
             ->handleRequest();
 
@@ -56,10 +57,12 @@ class Lynxtechnik_ModifyController extends ActionController
 
     public function serviceAction()
     {
+        $lconf = $this->lconf();
         $this->view->title = $this->translate('Modify Icinga Service');
 
         $form = $this->loadForm('icingaService')
             ->setDb($this->db())
+            ->setLConfSync($lconf)
             ->loadObject($this->params->get('id'))
             ->setSuccessUrl('lynxtechnik/list/services')
             ->handleRequest();
@@ -67,6 +70,9 @@ class Lynxtechnik_ModifyController extends ActionController
         $this->view->remove = $this->loadForm('remove');
         if ($this->view->remove->hasBeenSent()) {
             if ($form->getObject()->delete()) {
+                if ($lconf->isEnabled()) {
+                    $lconf->synchronize();
+                }
                 $form->notifySuccess('Service has been deleted');   
             }
             $this->redirectNow('lynxtechnik/list/services');

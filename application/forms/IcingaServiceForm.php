@@ -3,6 +3,7 @@
 namespace Icinga\Module\Lynxtechnik\Forms;
 
 use Icinga\Module\Lynxtechnik\IcingaService;
+use Icinga\Module\Lynxtechnik\LConfSync;
 use Icinga\Module\Lynxtechnik\Web\Form\QuickForm;
 
 class IcingaServiceForm extends QuickForm
@@ -10,6 +11,8 @@ class IcingaServiceForm extends QuickForm
     protected $db;
 
     protected $object;
+
+    protected $lconf;
 
     public function setup()
     {
@@ -42,9 +45,11 @@ class IcingaServiceForm extends QuickForm
     {
         if ($this->object) {
             $this->object->setProperties($this->getValues())->store();
+            $this->syncLConfIfEnabled();
             $this->redirectOnSuccess('The Icinga Service has successfully been stored');
         } else {
             IcingaService::create($this->getValues())->store($this->db);
+            $this->syncLConfIfEnabled();
             $this->redirectOnSuccess('A new Icinga Service has successfully been created');
         }
     }
@@ -76,5 +81,21 @@ class IcingaServiceForm extends QuickForm
         );
         $this->getElement('module_ids')->setMultiOptions($db->enumModules());
         return $this;
+    }
+
+    public function setLConfSync(LConfSync $lconf)
+    {
+        $this->lconf = $lconf;
+        if ($lconf->isEnabled()) {
+            $this->removeElement('template_id');
+        }
+        return $this;
+    }
+
+    protected function syncLConfIfEnabled()
+    {
+        if ($this->lconf !== null && $this->lconf->isEnabled()) {
+            $this->lconf->synchronize();
+        }
     }
 }
