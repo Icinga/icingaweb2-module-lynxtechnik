@@ -13,12 +13,6 @@ class Db extends DbConnection
         return $this->getDbAdapter();
     }
 
-    public function fetchLegacyModules()
-    {
-        $select = $this->db()->select()->from('lynx_device');
-        return $this->db()->fetchAll($select);
-    }
-
     public function fetchTemplates()
     {
         $select = $this->db()->select()->from('lynx_icinga_template', array(
@@ -40,6 +34,24 @@ class Db extends DbConnection
         return $this->db()->fetchAll($select);
     }
 
+    public function listServices()
+    {
+        $select = $this->db()->select()->from('lynx_icinga_service', array(
+            'id',
+            'service_description'
+        ))->order('service_description');
+        return $this->db()->fetchPairs($select);
+    }
+
+    public function listRackControllers()
+    {
+        $select = $this->db()->select()->from('lynx_module', array(
+            'INET_NTOA(controller_ip)',
+            'display_name'
+        ))->where('module_type IN (?)', array('controller'))->order('display_name');
+        return $this->db()->fetchPairs($select);
+    }
+
     public function fetchServices()
     {
         $select = $this->db()->select()->from(
@@ -56,7 +68,7 @@ class Db extends DbConnection
             array(
                 'host_name'
             )
-        )->join(
+        )->joinLeft(
             array('t' => 'lynx_icinga_template'),
             't.id = s.template_id',
             array(
@@ -181,9 +193,9 @@ class Db extends DbConnection
         return $this->db()->fetchAll($select);
     }
 
-    public function fetchAllDevices()
+    protected function deviceListColumns()
     {
-        $select = $this->select()->from('lynx_module', array(
+        return array(
             'id',
             'address' => 'controller_ip',
             'position',
@@ -196,48 +208,44 @@ class Db extends DbConnection
             'status_text',
             'status_color',
             'status_color_rgb'
-        ))->order('controller_ip ASC')->order('position ASC');
-        return $this->fetchAll($select);
-        
-        $select = $this->db()->select()->from('lynx_device')->order('address ASC')->order('position ASC');
+        );
+    }
+
+    protected function selectDevices()
+    {
+        return $this->db()->select()->from(
+            array('m' => 'lynx_module'),
+            $this->deviceListColumns()
+        )->order('controller_ip ASC')->order('position ASC');
+    }
+
+    public function fetchDevices($filter = null)
+    {
+        $select = $this->selectDevices();
+
+        if ($filter !== null) {
+
+            if (ctype_digit($filter)) {
+
+                $select->join(
+                    array('sm' => 'lynx_icinga_service_modules'),
+                    'sm.module_id = m.id',
+                    array()
+                )->join(
+                    array('s' => 'lynx_icinga_service'),
+                    'sm.service_id = s.id',
+                    array()
+                )->where('s.id = ?', $filter);
+
+            } else {
+
+                $ip = ip2long($filter);
+                if ($ip !== false) {
+                    $select->where('controller_ip = ?', $ip);
+                }
+            }
+        }
         return $this->db()->fetchAll($select);
     }
 
-    public function xxxfetchDevicesByIp($ips)
-    {
-        if (! is_array($ips)) {
-            $ips = array($ips);
-        }
-        foreach ($ips as & $ip) {
-            $ip = ip2long($ip);
-        }
-        $select = $this->select()->from('lynx_device')->where('address', $ips);
-        echo $select; exit;
-        return $this->fetchAll($select);
-//        $select = $this->db()->select()->from('lynx_device')->where('address IN (?)', $ips)->order('position ASC');
-        return $this->db()->fetchAll($select);
-    }
-
-    public function xxxxfetchOverview()
-    {
-        $select =  $this->db()->select()->from(
-            array('m' => 'lynx_device')
-        )->join(
-            array('s' => 'lynx_device'),
-            // AND m.id != s.id
-            'm.address = s.address AND m.position & 255 = 0 AND m.position & INET_ATON("255.255.255.0") = s.position & INET_ATON("255.255.255.0")',
-            array(
-                'sub_color' => 'MAX(s.status_color)',
-                'ip' => 'INET_NTOA(m.address)'
-            )
-        )
-         ->group('m.address')
-         ->group('m.position')
-         ->order('m.address ASC')
-         ->order('m.position ASC');
-         //echo $select; exit;
-        return $this->db()->fetchAll($select);
-    }
 }
-
-
