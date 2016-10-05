@@ -1,0 +1,40 @@
+<?php
+
+if ($device->is_rct) {
+    echo '<td class="rct">';
+} else {
+    echo '<td>';
+}
+
+echo '<h3 class="state ' . $device->state_class . '"';
+
+if ($this->small) {
+    echo ' title="'
+           . $this->escape($device->display_name . ': ' . $device->status_text)
+           . '"';
+}
+
+echo '>' . ($this->small ? '&nbsp;' : $this->escape($device->display_name)). '</h3>';
+
+if (! $this->small) {
+
+    echo '<span class="address">' . $device->position_text . ' - v' . $device->version . '</span>';
+
+    if ($device->status_text !== 'OK' && $device->status_text !== '0') {
+        echo '<ul class="errors">';
+        foreach (preg_split('/\n/', $device->status_text, -1, PREG_SPLIT_NO_EMPTY) as $error) {
+            echo '<li>' . $this->escape($error) . '</li>';
+        }
+        echo '</ul>';
+    }
+
+    echo '<p>' . $this->escape($device->type_name);
+    if ($device->type === 'controller') {
+        echo '<br />' . long2ip($device->address);
+    }
+
+    echo '</p>';
+}
+
+echo "</td>\n";
+

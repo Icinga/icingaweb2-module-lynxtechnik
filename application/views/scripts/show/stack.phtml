@@ -1,89 +1,75 @@
+<div class="controls">
+<?= $this->tabs ?>
+<form action="<?= $this->url() ?>" method="get" class="inline">
+<?= $this->formSelect('filter', $this->filter, array('class' => 'autosubmit'), array(
+    null      => '- choose filter -',
+    'Rack'    => $this->rack_list,
+    'Service' => $this->service_list
+)) ?>
+</form>
+<?php if ($this->small): ?>
+<a href="<?= $this->url()->without('small') ?>"><?= $this->icon('resize-full', 'Show large racks') ?></a>
+<?php else: ?>
+<a href="<?= $this->url()->with('small', true) ?>"><?= $this->icon('resize-small', 'Show compact racks') ?></a>
+<?php endif ?>
+</div>
+
 <div class="content">
-<h1><?= $this->escape($this->title) ?></h1>
 <?php
 
-$color_names = array(
-    'unknown', 'off', 'ok', 'warning', 'critical'
-);
+$color_names = array('unknown', 'off', 'ok', 'warning', 'critical');
 
-$ip = null;
-$new = false;
-$first = true;
-
-reset($this->devices);
-$main = current($this->devices);
-
-//echo '<h2>'
-//   . preg_replace('~^.+?\s*-\s*(.*)$~', '$1', $main->display_name) . ' (' . $this->escape(long2ip($main->address)) . ')'
-//   . "</h2>\n";
-
-echo '<div class="rack">
+echo '<div class="rack' . ($this->small ? ' small' : '') . '">
 <table class="frame"><tr>';
 
 $lastcol = 0;
+$lastrow = null;
+$lastaddress = null;
+
 foreach ($this->devices as $device) {
+    $row  = (int) (($device->position & 0x0000ff00) >> 8);
+    $rpos = (int) $device->position & 0x000000ff;
+
+    $device->is_rct = in_array($device->type, array('controller', 'expander'));
+    $device->state_class = $color_names[$device->status_color];
+
     if (preg_match('/ - /', $device->display_name)) {
         list($device->short_type, $device->display_name) =
             preg_split('/ - /', $device->display_name, 2);
     } else {
         $device->short_type = null;
     }
+
     // display_type is unused right, now. We remove it for DWTV as the policy
     // here requires us to write the type in front of the display_name
-    $rpos = (int) $device->position & 0x000000ff;
-    if ($rpos === 0) {
-        if ($first) {
-            $first = false;
-        } else {
+    if ($lastrow !== null && $lastaddress !== $device->address || $row !== $lastrow)  {
 
-            if ($lastcol > 0) {
-                for ($i = $lastcol; $i < 10; $i++) {
-                    echo $this->partial('show/module_emptyslot.phtml');
-                }
+        if ($lastcol > 0) {
+            for ($i = $lastcol + 1; $i <= 10; $i++) {
+                echo $this->partial('show/module_emptyslot.phtml', array('pos' => $i, 'small' => $this->small));
             }
-
-            echo "</tr></table>\n" . '<table class="frame"><tr>' . "\n";
         }
-    }
 
-    for ($i = 1; $i < ($rpos - $lastcol); $i++) {
-        echo $this->partial('show/module_emptyslot.phtml');
-    }
+        echo "</tr></table>\n" . '<table class="frame"><tr>' . "\n";
 
-    if ($rpos === 0) {
-        echo '<td class="rct">';
+        for ($i = 0; $i < $rpos; $i++) {
+            echo $this->partial('show/module_emptyslot.phtml', array('pos' => $i, 'small' => $this->small));
+        }
     } else {
-        echo '<td>';
-    }
-    
-    echo '<h3 class="state '
-       . $color_names[$device->status_color]
-       . '">'
-       // . $color_names[$device->status_color]
-       . $this->escape($device->display_name)
-       . '</h3>'
-//       . '<h4>'
-//       . '</h4>'
-       . '<span class="address">' . $device->position_text . ' - v' . $device->version . '</span>'
-       ;
 
-    if ($device->status_text !== 'OK' && $device->status_text !== '0') {
-        echo '<ul class="errors">';
-        foreach (preg_split('/\n/', $device->status_text, -1, PREG_SPLIT_NO_EMPTY) as $error) {
-            echo '<li>' . $this->escape($error) . '</li>';
+        for ($i = $lastcol + 1; $i < $rpos; $i++) {
+            echo $this->partial('show/module_emptyslot.phtml', array('pos' => $i, 'small' => $this->small));
         }
-        echo '</ul>';
+
     }
-
-    echo '<p>' . $this->escape($device->type_name) . '</p>'
-       . "</td>\n"
-       ;
-
+    echo $this->partial('show/module_detailled.phtml', array('device' => $device, 'small' => $this->small));
     $lastcol = $rpos;
+    $lastrow = $row;
+    $lastaddress = $device->address;
 }
 
-for ($i = $lastcol; $i < 10; $i++) {
-    echo $this->partial('show/module_emptyslot.phtml');
+for ($i = $lastcol + 1; $i <= 10; $i++) {
+    echo $this->partial('show/module_emptyslot.phtml', array('pos' => $i, 'small' => $this->small));
 }
 
 ?>

@@ -8,6 +8,33 @@ dd {
 }
 /* END of Forms */
 
+a.not-wide {
+    display: inline;
+}
+
+a.wide {
+    display: none;
+}
+
+#layout.wide-layout {
+    a.not-wide {
+        display: none;
+    }
+
+    a.wide {
+        display: inline;
+    }
+}
+
+
+h1 {
+    font-size: 1.2em;
+}
+
+.controls a:focus {
+    outline: none;
+}
+
 div.rack {
     border-radius: 0.3em;
     margin-bottom: 0.6em;
@@ -19,16 +46,16 @@ div.rack {
 
 div.rack {
 
-  table {
-    border: 2px solid black;
-    margin-bottom: 0.6em;
-    table-layout: fixed;
-  }
-
   table.frame {
     table-layout: fixed;
     border: 2px solid black;
     background-color: white;
+    margin-bottom: 0.6em;
+    width: 100%;
+  }
+
+  table.frame h3 {
+    border-bottom: none;
   }
 
   table td {
@@ -36,8 +63,15 @@ div.rack {
     vertical-align: top;
     text-align: center;
     padding: 1px;
-    width: 9%;
+    width: 9.091%;
+    border-left: 1px solid #555;
   }
+
+  table td:first-child {
+    border-left: none;
+  }
+
+
 
   table .state {
     text-align: center;
@@ -69,6 +103,7 @@ div.rack {
 
   table td.empty {
     background: #ccc;
+    padding-top: 2.5em;
   }
 
   table td.rct {
@@ -79,17 +114,8 @@ div.rack {
   table td span.address {
     text-align: center;
     display: block;
-/*
-    border-top: 1px solid #555;
-    font-family: monospace;
-    margin-bottom: 0.8em;
-*/
   }
-/*
-  table td.rct span.address {
-    border-color: white;
-  }
-*/
+
   table td h4 {
     margin: 0;
     padding: 0;
@@ -118,7 +144,7 @@ div.rack {
 
   table th a {
       color: white;
-      font-weight: bold;
+      font-weight: normal;
       text-decoration: none;
   }
 
@@ -128,6 +154,57 @@ div.rack {
 
 }
 
+div.rack.small {
+    padding: 0.1em;
+    width: 10em;
+
+    table.frame {
+        width: 10em;
+        margin-bottom: 0.1em;
+    }
+    table.frame td {
+        line-height: 1.2em;
+        background: #ccc;
+        border-left: 1px solid #555;
+    }
+    table.frame td:first-child {
+        border-left: none;
+    }
+    table.frame td.rct {
+        background: #555;
+        padding-top: 0.15em;
+        padding-top: 0.15em;
+        line-height: 0.9em;
+    }
+
+    table.frame td {
+        cursor: help;
+    }
+
+    table.frame td.empty {
+        cursor: text;
+        padding-top: 0;
+    }
+
+    table th {
+        text-align: left;
+        line-height: 1em;
+        background-color: #555;
+        color: white;
+        font-size: 0.7em;
+        text-align: center;
+        overflow: hidden;
+        font-weight: normal;
+    }
+
+    table th a {
+        display: block;
+    }
+
+    table th a:focus {
+        outline: none;
+    }
+}
 
 div.compactrack {
 
@@ -248,4 +325,8 @@ span.state.warning {
 
 span.state.unknown {
     background: @colorUnknown;
+}
+
+#layout.twocols .rack {
+    font-size: 0.7em;
 }

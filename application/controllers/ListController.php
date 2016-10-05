@@ -37,7 +37,7 @@ class Lynxtechnik_ListController extends ActionController
 
     public function controllersAction()
     {
-        $this->setDatacenterTabs()->activate('controllers');
+        $this->setIcingaTabs()->activate('controllers');
         $this->view->list = $this->db()->fetchControllers();
     }
 }

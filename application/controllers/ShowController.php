@@ -3,34 +3,35 @@
 use Icinga\Module\Lynxtechnik\ActionController;
 use Icinga\Module\Lynxtechnik\Db;
 use Icinga\Module\Lynxtechnik\Device;
+use Icinga\Web\Widget;
 
 class Lynxtechnik_ShowController extends ActionController
 {
-    public function oldoverviewAction()
+    protected function prepareFilterArray($array, $prefix)
     {
-        $this->view->title = 'Lynx Devices';
-        $this->view->devices = array();
-        $ips = array(
-            '192.168.56.28',
-        );
-        foreach ($ips as $ip) {
-            $this->view->devices[$ip] = new Device('192.168.56.28', 'public');
+        $new = array();
+        foreach ($array as $key => $val) {
+            $new[$prefix . $key] = $val;
         }
-    }
-
-    public function overviewAction()
-    {
-        $this->view->title = 'Lynx Devices';
-        $this->view->devices = $this->db()->fetchOverview();
+        return $new;
     }
 
     public function stackAction()
     {
-        $ip = $this->_getParam('ip');
         $this->setAutorefreshInterval(15);
         $this->view->title = 'Lynx Devices';
-//        $this->view->title = 'Lynx Device: ' . $ip;
-//        $this->view->devices = $this->db()->fetchDevicesByIp(preg_split('~,~', $ip));
-        $this->view->devices = $this->db()->fetchAllDevices();
+        $this->view->tabs = Widget::create('tabs')->add('lynx', array(
+            'label' => $this->view->title,
+            'url'   => $this->_request->getUrl()
+        ));
+        $this->view->small = $this->params->get('small');
+        $this->view->tabs->activate('lynx');
+
+        $db = $this->db();
+        $this->view->rack_list    = $db->listRackControllers();
+        $this->view->service_list = $db->listServices();
+
+        $this->view->filter  = $this->_request->get('filter');
+        $this->view->devices = $db->fetchDevices($this->view->filter);
     }
 }

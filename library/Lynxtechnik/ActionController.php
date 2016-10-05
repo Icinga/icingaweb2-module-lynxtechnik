@@ -2,14 +2,25 @@
 
 namespace Icinga\Module\Lynxtechnik;
 
-use Icinga\Web\Controller\ModuleActionController;
-use Icinga\Web\Widget;
+use Icinga\Application\Icinga;
 use Icinga\Module\Lynxtechnik\Db;
 use Icinga\Module\Lynxtechnik\Web\Form\FormLoader;
+use Icinga\Web\Controller;
+use Icinga\Web\Widget;
 
-abstract class ActionController extends ModuleActionController
+abstract class ActionController extends Controller
 {
     protected $db;
+
+    protected $forcedMonitoring = false;
+
+    public function init()
+    {
+        $m = Icinga::app()->getModuleManager();
+        if (! $m->hasLoaded('monitoring') && $m->hasInstalled('monitoring')) {
+            $m->loadModule('monitoring');
+        }
+    }
 
     public function loadForm($name)
     {
@@ -20,16 +31,16 @@ abstract class ActionController extends ModuleActionController
     protected function setIcingaTabs()
     {
         $this->view->tabs = Widget::create('tabs')->add('services', array(
-            'title' => $this->translate('Services'),
+            'label' => $this->translate('Services'),
             'url'   => 'lynxtechnik/list/services')
         )->add('hosts', array(
-            'title' => $this->translate('Hosts'),
+            'label' => $this->translate('Hosts'),
             'url'   => 'lynxtechnik/list/hosts')
         )->add('templates', array(
             'title' => $this->translate('Templates'),
             'url'   => 'lynxtechnik/list/templates')
         )->add('config', array(
-            'title' => $this->translate('Config'),
+            'label' => $this->translate('Config'),
             'url'   => 'lynxtechnik/icinga/config')
         );
         return $this->view->tabs;
@@ -38,13 +49,13 @@ abstract class ActionController extends ModuleActionController
     protected function setDatacenterTabs()
     {
         $this->view->tabs = Widget::create('tabs')->add('rooms', array(
-            'title' => $this->translate('DC rooms'),
+            'label' => $this->translate('DC rooms'),
             'url'   => 'lynxtechnik/list/rooms')
         )->add('racks', array(
-            'title' => $this->translate('Racks'),
+            'label' => $this->translate('Racks'),
             'url'   => 'lynxtechnik/list/racks')
         )/*->add('frames', array(
-            'title' => $this->translate('Frames'),
+            'label' => $this->translate('Frames'),
             'url'   => 'lynxtechnik/list/frames')
         )*/->add('controllers', array(
             'title' => $this->translate('Controllers'),
@@ -56,7 +67,7 @@ abstract class ActionController extends ModuleActionController
     protected function db()
     {
         if ($this->db === null) {
-            $this->db = Db::fromResourceName($this->Config()->db->resource);
+            $this->db = Db::fromResourceName($this->Config()->get('db', 'resource'));
         }
 
         return $this->db;

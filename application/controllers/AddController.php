@@ -4,12 +4,6 @@ use Icinga\Module\Lynxtechnik\ActionController;
 
 class Lynxtechnik_AddController extends ActionController
 {
-    public function __moduleAction()
-    {
-        $this->view->title = 'Lynx Devices';
-        $this->view->devices = $this->db()->fetchOverview();
-    }
-
     public function templateAction()
     {
         $this->view->title = $this->translate('Add new Icinga Template');

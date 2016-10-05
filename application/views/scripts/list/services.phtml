@@ -38,6 +38,16 @@ foreach ($states as $state) {
   <?php if (! empty($stateInfo)): ?>
   <?= implode(' ', $stateInfo) ?>
   <?php endif ?>
+  <a class="not-wide" data-base-target="_main" href="<?= $this->url('lynxtechnik/show/stack', array(
+      'filter' => $row->id
+  )) ?>"><?= $this->icon('tasks', 'Show rack view') ?></a>
+  <a class="wide" href="<?= $this->url('lynxtechnik/show/stack', array(
+      'filter' => $row->id
+  )) ?>"><?= $this->icon('tasks', 'Show rack view') ?></a>
+  <a href="<?= $this->url('monitoring/service/show', array(
+      'host'    => $row->host_name,
+      'service' => $row->service_description
+  )) ?>"><?= $this->icon('service', 'Show Icinga service state') ?></a>
   <br /> <small style="font-size: 0.8em;"><?= $this->escape(preg_replace('/,/', '; ', $row->modules)) ?></small>
   <?php endif ?></td>
 </tr>
