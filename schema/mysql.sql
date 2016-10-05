@@ -59,12 +59,14 @@ CREATE TABLE lynx_module
   type_code INT(10) UNSIGNED NOT NULL, -- TODO: this is always 0, do we really need this?
   type_name VARCHAR(255) NOT NULL
     COMMENT 'Plaintext module type (e.g. "PDX5312 SD Deembedder")',
+  prefix VARCHAR(16) NOT NULL COMMENT 'SNMP OID prefix',
   status_text TEXT
     COMMENT 'Plaintext module status, mostly "OK" or an error message',
   status_color TINYINT(3) UNSIGNED NOT NULL
     COMMENT 'Numeric status color, currently 0-4',
   status_color_rgb VARCHAR(8) DEFAULT NULL
     COMMENT 'RGB status color code (e.g. #ff0000)',
+  uptime INT(10) UNSIGNED NOT NULL COMMENT 'Module uptime',
   ctime DATETIME NOT NULL
     COMMENT 'Time this module got created',
   mtime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -128,10 +130,11 @@ CREATE TABLE lynx_icinga_template
 CREATE TABLE lynx_icinga_host
 (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique Icinga host id',
-  template_id INT(10) UNSIGNED NOT NULL COMMENT 'Icinga template reference',
+  template_id INT(10) UNSIGNED DEFAULT NULL COMMENT 'Icinga template reference',
   host_name VARCHAR(255) NOT NULL COMMENT 'Icinga host name',
 
   PRIMARY KEY (id),
+  UNIQUE INDEX host_name (host_name),
   CONSTRAINT lynx_icinga_host_template
     FOREIGN KEY template (template_id)
     REFERENCES lynx_icinga_template (id)
@@ -142,11 +145,12 @@ CREATE TABLE lynx_icinga_service
 (
   id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Unique Icinga service id',
   host_id INT(10) UNSIGNED NOT NULL COMMENT 'Icinga host reference',
-  template_id INT(10) UNSIGNED NOT NULL COMMENT 'Icinga template reference',
+  template_id INT(10) UNSIGNED DEFAULT NULL COMMENT 'Icinga template reference',
   service_description VARCHAR(255) NOT NULL COMMENT 'Icinga service description / identifier',
 
   PRIMARY KEY (id),
   KEY search_host (host_id),
+  UNIQUE INDEX service_description (service_description),
   CONSTRAINT lynx_icinga_service_host
     FOREIGN KEY host (host_id)
     REFERENCES lynx_icinga_host (id)
@@ -166,23 +170,13 @@ CREATE TABLE lynx_icinga_service_modules
   CONSTRAINT lynx_service_modules_service
     FOREIGN KEY service (service_id)
     REFERENCES lynx_icinga_service (id)
-    ON DELETE RESTRICT,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT lynx_service_modules_module
     FOREIGN KEY module (module_id)
     REFERENCES lynx_module (id)
-    ON DELETE RESTRICT
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This assigns LYNX Technik modules to Icinga services';
 
-
-
-ALTER TABLE lynx_module ADD prefix VARCHAR(16) NOT NULL COMMENT 'SNMP OID prefix' AFTER type_name;
-ALTER TABLE lynx_module ADD uptime INT(10) UNSIGNED NOT NULL COMMENT 'Module uptime' after status_color_rgb;
-ALTER TABLE lynx_controller ADD last_discovery DATETIME DEFAULT NULL AFTER community;
-ALTER TABLE lynx_module MODIFY module_type ENUM('controller', 'expander', 'module', 'stack','rack','slot') NOT NULL  -- TODO: change this to controller, expander, module
-    COMMENT 'Shows whether this module has a special role (e.g. controller)';
-UPDATE lynx_module SET module_type = 'controller' WHERE module_type = 'stack';
-UPDATE lynx_module SET module_type = 'expander' WHERE module_type = 'rack';
-UPDATE lynx_module SET module_type = 'module' WHERE module_type = 'slot';
-ALTER TABLE lynx_module MODIFY module_type ENUM('controller', 'expander', 'module') NOT NULL
-    COMMENT 'Shows whether this module has a special role (e.g. controller)';
 
